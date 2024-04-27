@@ -1,0 +1,24 @@
+const int sensorPin = A0;   // Analog pin A0 for sensor output
+const float voltageConversionFactor = 5.0 / 1023.0;  // Conversion factor for analog readings to voltage (5V Arduino)
+
+void setup() {
+    Serial.begin(9600);
+}
+
+void loop() {
+    // Read analog voltage from sensor pin
+    int sensorValue = analogRead(sensorPin);
+    
+    // Convert analog reading to voltage
+    float voltage = sensorValue * voltageConversionFactor;
+    
+    // Convert voltage to PM2.5 concentration (0.5V corresponds to 0.1 mg/m^3)
+    float pm25Concentration = voltage * (0.1 / 0.5);
+    
+    // Print the PM2.5 concentration
+    Serial.print("PM2.5 Concentration: ");
+    Serial.print(pm25Concentration);
+    Serial.println(" mg/m^3");
+    
+    delay(1000);  // Adjust delay as needed for your applications
+}
