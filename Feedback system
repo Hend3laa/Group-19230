@@ -1,0 +1,63 @@
+#include <Servo.h>
+#include <SoftwareSerial.h>
+#define CO_SENSOR_PIN A0
+#define DUST_SENSOR_PIN A1
+#define CO_THRESHOLD_MIN 240
+#define CO_THRESHOLD_MAX 300
+#define DUST_THRESHOLD_MIN 0.2
+#define DUST_THRESHOLD_MAX 0.9
+
+Servo servoMotor;
+SoftwareSerial sim800l(2, 3); // RX, TX
+int fanPin = 4;
+
+void setup() {
+  pinMode(CO_SENSOR_PIN, INPUT);
+  pinMode(DUST_SENSOR_PIN, INPUT);
+  servoMotor.attach(5); // Servo motor connected to pin 5
+  pinMode(fanPin, OUTPUT);
+  sim800l.begin(9600);
+}
+
+void loop() {
+  int coLevel = analogRead(CO_SENSOR_PIN);
+  float coPPM = map(coLevel, 0, 1023, 0, 500); // Assuming analog read value is linear to PPM
+
+  int dustLevel = analogRead(DUST_SENSOR_PIN);
+  float dustDensity = map(dustLevel, 0, 1023, 0, 1); // Assuming analog read value is linear to mg/m^3
+
+  if (coPPM >= CO_THRESHOLD_MIN && coPPM <= CO_THRESHOLD_MAX) {
+    rotateServo();
+    sendSMS("CO gas detected! Servo activated to open louvre window.");
+  }
+
+  if (dustDensity >= DUST_THRESHOLD_MIN && dustDensity <= DUST_THRESHOLD_MAX) {
+    operateFan();
+    sendSMS("High dust density detected! Fan activated to remove dust particles.");
+  }
+
+  delay(10000); // Delay for 10 seconds before next sensor readings
+}
+
+void rotateServo() {
+  servoMotor.write(180); // Rotate servo 180 degrees (assuming 180 degrees opens the louvre window)
+  delay(1000); // Wait for servo to reach position
+}
+
+void operateFan() {
+  digitalWrite(fanPin, HIGH); // Turn on fan
+  delay(5000); // Run fan for 5 seconds (adjust as necessary)
+  digitalWrite(fanPin, LOW); // Turn off fan
+}
+
+void sendSMS(String message) {
+  sim800l.println("AT+CMGF=1"); // Set SMS mode to text
+  delay(100);
+  sim800l.println("AT+CMGS=\"+1234567890\""); // Replace with recipient's phone number
+  delay(100);
+  sim800l.println(message);
+  delay(100);
+  sim800l.println((char)26); // End AT command with Ctrl+Z
+  delay(100);
+  sim800l.println();
+}
