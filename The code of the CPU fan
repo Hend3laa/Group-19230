@@ -1,0 +1,20 @@
+const int fanPin = 9;  // Define the pin for controlling the fan
+int fanSpeed = 0;      // Variable to store the fan speed
+
+void setup() {
+  pinMode(fanPin, OUTPUT);  // Set the fan pin as an output
+}
+
+void loop() {
+  // Example: gradually increase fan speed from 0 to 255 (PWM signal)
+  for (fanSpeed = 0; fanSpeed <= 255; fanSpeed++) {
+    analogWrite(fanPin, fanSpeed);  // Set fan speed
+    delay(10);  // Small delay for gradual change
+  }
+  
+  // Example: gradually decrease fan speed from 255 to 0
+  for (fanSpeed = 255; fanSpeed >= 0; fanSpeed--) {
+    analogWrite(fanPin, fanSpeed);  // Set fan speed
+    delay(10);  // Small delay for gradual change
+  }
+}
