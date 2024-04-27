@@ -1,0 +1,42 @@
+ const int AOUTpin = 0;   // Analog pin A0 for analog output
+const int DOUTpin = 8;   // Digital pin D8 for digital output
+const int ledPin = 13;   // Digital pin D13 for LED output
+
+int limit;
+int value;
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(DOUTpin, INPUT);
+    pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+    value = analogRead(AOUTpin);
+   
+    // Convert analog reading to ppm using your conversion formula
+    int ppm = convertToPPM(value);
+
+    Serial.print("CO value (ppm): ");
+    Serial.println(ppm);
+    
+    limit = digitalRead(DOUTpin);
+    Serial.print("Limit: ");
+    Serial.println(limit);
+    
+    delay(100);
+    
+    if (limit == HIGH) {
+        digitalWrite(ledPin, HIGH);
+    } else {
+        digitalWrite(ledPin, LOW);
+    }
+}
+
+int convertToPPM(int analogValue) {
+    // Convert analog reading to ppm using your conversion formula
+    // Example: ppm = analogValue * conversionFactor;
+    // You need to replace "conversionFactor" with the appropriate value based on your sensor's calibration.
+    return analogValue;  // Replace with actual conversion formula
+}
+  
